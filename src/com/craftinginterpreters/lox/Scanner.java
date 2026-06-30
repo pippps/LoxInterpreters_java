@@ -78,7 +78,13 @@ class Scanner {
             case '/':
                 if(match('/')){
                     while(peek() != '\n' && !isAtEnd()) advance();
-                } else {
+                }
+                //challenge implementation c style block comments
+                else if(match('*')){
+                    c_style_block_comment();
+                    break;
+                }
+                else {
                     addToken(SLASH);
                 }
                 break;
@@ -106,6 +112,25 @@ class Scanner {
                 }
                 break;
         }
+    }
+
+    private void c_style_block_comment() {
+        int depth = 0;
+    while((peek() != '*' || peekNext() != '/' || depth != 0) && !isAtEnd()) {
+            if (peek() == '\n')
+                line++;
+            if(peek() == '/' && peekNext() == '*')
+                depth++;
+            if(peek() == '*' && peekNext() == '/')
+                depth--;
+            advance();
+        }
+
+        if (isAtEnd()) {
+            Lox.error(line, "Unterminated comment.");
+            return;
+        }
+        advance(); advance();
     }
 
     private void identifier() {

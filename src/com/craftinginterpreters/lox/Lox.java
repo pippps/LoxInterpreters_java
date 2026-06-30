@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Lox {
     static boolean hadError = false;
-    static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
         if (args.length > 1){
             System.out.println("Usage jLox [script]");
             System.exit(64);

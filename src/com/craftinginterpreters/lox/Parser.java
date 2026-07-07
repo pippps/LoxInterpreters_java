@@ -27,12 +27,22 @@ public class Parser {
     private Expr conditional() {
         Expr expr = equality();
 
-        if match()
+        if (match(CONDITIONAL_1)){
+            Token operator = previous();
+            Expr right = expression();
+            expr = new Expr.Binary(expr, operator, right);
+            if (match(CONDITIONAL_2)){
+                operator = previous();
+                right = conditional();
+                expr = new Expr.Binary(expr,operator, right);
+            }
+        }
+        return expr;
     }
 
     private Expr equality() {
         Expr expr = comparison();
-        while (match(BANG_EQUAL, EQUAL)) {
+        while (match(BANG_EQUAL, EQUAL_EQUAL)) {
             Token operator = previous();
             Expr right = comparison();
             expr = new Expr.Binary(expr, operator, right);

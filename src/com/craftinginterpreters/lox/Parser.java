@@ -14,10 +14,21 @@ public class Parser {
 
     Expr parse() {
         try {
-            return expression();
+            return comma();
         } catch (ParserError error) {
             return null;
         }
+    }
+
+    private Expr comma() {
+        Expr expr = expression();
+
+        while (match(COMMA)){
+            Token operator = previous();
+            Expr right = expression();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+        return expr;
     }
 
     private Expr expression() {
@@ -26,6 +37,7 @@ public class Parser {
 
     private Expr equality() {
         Expr expr = comparison();
+
         while (match(BANG_EQUAL, EQUAL)) {
             Token operator = previous();
             Expr right = comparison();

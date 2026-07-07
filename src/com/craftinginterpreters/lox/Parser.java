@@ -14,14 +14,18 @@ public class Parser {
 
     Expr parse() {
         try {
-            return comma();
+            return expression();
         } catch (ParserError error) {
             return null;
         }
     }
 
+    private Expr expression() {
+        return comma();
+    }
+
     private Expr comma() {
-        Expr expr = expression();
+        Expr expr = equality();
 
         while (match(COMMA)){
             Token operator = previous();
@@ -29,10 +33,6 @@ public class Parser {
             expr = new Expr.Binary(expr, operator, right);
         }
         return expr;
-    }
-
-    private Expr expression() {
-        return equality();
     }
 
     private Expr equality() {

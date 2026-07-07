@@ -29,7 +29,7 @@ public class Parser {
 
         while (match(COMMA)){
             Token operator = previous();
-            Expr right = expression();
+            Expr right = equality();
             expr = new Expr.Binary(expr, operator, right);
         }
         return expr;

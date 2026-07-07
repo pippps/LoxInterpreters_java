@@ -21,7 +21,13 @@ public class Parser {
     }
 
     private Expr expression() {
-        return equality();
+        return conditional();
+    }
+
+    private Expr conditional() {
+        Expr expr = equality();
+
+        if match()
     }
 
     private Expr equality() {

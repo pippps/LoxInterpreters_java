@@ -28,14 +28,10 @@ public class Parser {
         Expr expr = equality();
 
         if (match(CONDITIONAL_1)){
-            Token operator = previous();
-            Expr right = expression();
-            expr = new Expr.Binary(expr, operator, right);
-            if (match(CONDITIONAL_2)){
-                operator = previous();
-                right = conditional();
-                expr = new Expr.Binary(expr,operator, right);
-            }
+            Expr leftcond = expression();
+            consume(CONDITIONAL_2, "Except ':' after the first branch of conditional.");
+            Expr rightcond = conditional();
+            expr = new Expr.Conditional(expr, leftcond, rightcond);
         }
         return expr;
     }

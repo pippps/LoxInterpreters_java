@@ -94,6 +94,11 @@ public class Parser {
             return new Expr.Grouping(expr);
         }
 
+        if(match(PLUS, BANG, BANG_EQUAL, STAR, SLASH, EQUAL_EQUAL, GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
+            error(previous(), "missing left handed operand.");
+            return null;
+        }
+
         throw error(peek(), "Except expression.");
     }
 

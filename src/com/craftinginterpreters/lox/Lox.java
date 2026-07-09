@@ -39,6 +39,7 @@ public class Lox {
             if (line == null) break;
             run(line);
             hadError = false;
+            System.out.print("\n");
         }
     }
 

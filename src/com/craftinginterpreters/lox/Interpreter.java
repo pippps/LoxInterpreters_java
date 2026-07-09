@@ -29,7 +29,7 @@ public class Interpreter implements Expr.Visitor<Object> {
             case BANG:
                 return !isTruthy(right);
             case MINUS:
-                checkNumberOperand(expr.operator, expr.right);
+                checkNumberOperand(expr.operator, right);
                 return -(double)right;
         }
         //Unreachable
@@ -67,6 +67,8 @@ public class Interpreter implements Expr.Visitor<Object> {
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings.");
             case SLASH:
                 checkNumberOperands(expr.operator, left, right);
+                if((double)right == 0)
+                   throw new RuntimeError(expr.operator, "Can not divide by zero.");
                 return (double)left / (double)right;
             case STAR:
                 checkNumberOperands(expr.operator, left, right);

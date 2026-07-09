@@ -13,6 +13,7 @@ public class Interpreter implements Expr.Visitor<Object> {
 
     @Override
     public Object visitLiteralExpr (Expr.Literal expr) {
+
         return expr.value;
     }
 
@@ -29,7 +30,7 @@ public class Interpreter implements Expr.Visitor<Object> {
             case BANG:
                 return !isTruthy(right);
             case MINUS:
-                checkNumberOperand(expr.operator, expr.right);
+                checkNumberOperand(expr.operator, right);
                 return -(double)right;
         }
         //Unreachable
@@ -122,5 +123,4 @@ public class Interpreter implements Expr.Visitor<Object> {
     private Object evaluate(Expr expr) {
         return expr.accept(this);
     }
-
 }

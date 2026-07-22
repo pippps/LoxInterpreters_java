@@ -22,10 +22,6 @@ public class Parser {
         return statements;
     }
 
-    private Expr expression() {
-        return assignment();
-    }
-
     private Stmt declaration() {
         try {
             if (match(VAR)) return varDeclaration();
@@ -76,6 +72,10 @@ public class Parser {
 
         consume(RIGHT_BRACE, "Expect '}' after block.");
         return statements;
+    }
+
+    private Expr expression() {
+        return assignment();
     }
 
     private Expr assignment() {

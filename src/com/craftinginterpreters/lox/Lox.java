@@ -13,6 +13,9 @@ public class Lox {
     static boolean hadError = false;
     static boolean hadRuntimeError = false;
 
+    //this branch
+    static boolean isPrompt = false;
+
     static void main(String[] args) throws IOException {
         if (args.length > 1){
             System.out.println("Usage jLox [script]");
@@ -32,6 +35,7 @@ public class Lox {
     private static void runPrompt() throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
+        isPrompt = true;
 
         for(;;){
             System.out.print("> ");
@@ -50,7 +54,7 @@ public class Lox {
         List<Stmt> statements = parser.parse();
         if (hadError) return;
 
-        interpreter.interpret(statements);
+        interpreter.interpret(statements, isPrompt);
     }
 
     static void error(int line, String message) {

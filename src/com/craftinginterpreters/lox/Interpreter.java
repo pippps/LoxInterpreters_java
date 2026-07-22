@@ -7,9 +7,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     private Environment environment = new Environment();
 
-    void interpret(List<Stmt> statements) {
+    void interpret(List<Stmt> statements, boolean isPrompt) {
         try{
             for (Stmt statement : statements) {
+                if(isPrompt && isExpression(statement)) {
+                    Object value = evaluate(((Stmt.Expression)statement).expression);
+                    System.out.println(stringify(value));
+                }
                 execute(statement);
             }
         }catch (RuntimeError error) {
@@ -19,7 +23,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     @Override
     public Object visitLiteralExpr (Expr.Literal expr) {
-
         return expr.value;
     }
 
@@ -131,6 +134,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         return object.toString();
     }
 
+    private boolean isExpression (Stmt statement) {
+        if(statement instanceof Stmt.Expression){
+            return true;
+        }
+        return false;
+    }
+
     private Object evaluate(Expr expr) {
         return expr.accept(this);
     }
@@ -161,7 +171,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     @Override
     public Void visitExpressionStmt(Stmt.Expression stmt) {
-        System.out.print(evaluate(stmt.expression));
+        evaluate(stmt.expression);
         return null;
     }
 

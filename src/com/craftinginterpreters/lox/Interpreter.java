@@ -6,6 +6,7 @@ import java.util.List;
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     private Environment environment = new Environment();
+    private static Object uninitialized = new Object();
 
     void interpret(List<Stmt> statements) {
         try{
@@ -45,6 +46,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     @Override
     public Object visitVariableExpr(Expr.Variable expr) {
+        Object value = environment.get(expr.name);
+
+        if(value == uninitialized){
+            throw new RuntimeError(expr.name, "variable '" + expr.name.lexeme + "' must be initialized first.");
+        }
         return environment.get(expr.name);
     }
 
@@ -174,7 +180,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     @Override
     public Void visitVarStmt(Stmt.Var stmt) {
-        Object value = null;
+        Object value = uninitialized;
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
         }

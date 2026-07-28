@@ -1,6 +1,5 @@
 package com.craftinginterpreters.lox;
 
-import javax.print.attribute.standard.PrinterLocation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +33,7 @@ class Scanner {
         keywords.put("true",  TRUE);
         keywords.put("var", VAR);
         keywords.put("while", WHILE);
+        keywords.put("break", BREAK);
     }
 
     Scanner(String source){

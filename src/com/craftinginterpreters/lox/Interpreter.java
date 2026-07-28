@@ -1,5 +1,6 @@
 package com.craftinginterpreters.lox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -103,6 +104,18 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
         //Unreachable
         return null;
+    }
+    @Override
+    public Object visitCallExpr(Expr.Call expr) {
+        Object callee = evaluate(expr.callee);
+
+        List<Object> arguments = new ArrayList<>();
+        for (Expr argument : expr.arguments) {
+            arguments.add(evaluate(argument));
+        }
+
+        LoxCallable function = (LoxCallable)calle;
+        return function.call(this, arguments);
     }
 
     private void checkNumberOperand(Token operator, Object operand) {

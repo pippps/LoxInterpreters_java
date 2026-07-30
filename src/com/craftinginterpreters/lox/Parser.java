@@ -29,7 +29,11 @@ public class Parser {
 
     private Stmt declaration() {
         try {
-            if (match(FUN)) return function("function");
+            if (check(FUN) && checkNext(IDENTIFIER)) {
+                consume(FUN, null);
+                return function("function");
+            }
+
             if (match(VAR)) return varDeclaration();
             return statement();
         } catch (ParserError error) {
@@ -346,6 +350,12 @@ public class Parser {
     private boolean check(TokenType type) {
         if (isAtEnd()) return false;
         return peek().type == type;
+    }
+
+    private boolean checkNext(TokenType type) {
+        if (isAtEnd()) return false;
+        if (tokens.get(current + 1).type == EOF) return false;
+        return tokens.get(current + 1).type == type;
     }
 
     private Token advance() {

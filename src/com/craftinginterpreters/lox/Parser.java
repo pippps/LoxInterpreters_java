@@ -24,7 +24,6 @@ public class Parser {
     }
 
     private Expr expression() {
-        if(match(FUN)) return lambda();
         return assignment();
     }
 
@@ -146,20 +145,7 @@ public class Parser {
 
     private Stmt.Function function(String kind) {
         Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
-        consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
-        List<Token> parameters = new ArrayList<>();
-        if (!check(RIGHT_PAREN)) {
-            do {
-                if (parameters.size() >= 255) {
-                    error(peek(), "Can't jave more than 255 parameters.");
-                }
-                parameters.add(consume(IDENTIFIER, "Expect parameter name."));
-            } while (match(COMMA));
-        }
-        consume(RIGHT_PAREN, "Expect ')' after parameters.");
-        consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
-        List<Stmt> body = block();
-        return new Stmt.Function(name, parameters, body);
+        return new Stmt.Function(name, functionBody(kind));
     }
 
     private List<Stmt> block() {
@@ -173,21 +159,23 @@ public class Parser {
         return statements;
     }
 
-    private Expr lambda() {
-        consume(LEFT_PAREN, "Expect '(' after fun ");
+    private Expr.Function functionBody(String kind) {
+        consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
         List<Token> parameters = new ArrayList<>();
         if (!check(RIGHT_PAREN)) {
             do {
-                if (parameters.size() >= 255) {
-                    error(peek(), "Can't jave more than 255 parameters.");
+                if (parameters.size() >= 8) {
+                    error(peek(), "Can't have more than 8 parameters.");
                 }
+
                 parameters.add(consume(IDENTIFIER, "Expect parameter name."));
             } while (match(COMMA));
         }
         consume(RIGHT_PAREN, "Expect ')' after parameters.");
-        consume(LEFT_BRACE, "Expect '{' before body.");
+
+        consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
         List<Stmt> body = block();
-        return new Expr.Lambda(parameters, body);
+        return new Expr.Function(parameters, body);
     }
 
     private Expr assignment() {
@@ -317,6 +305,7 @@ public class Parser {
     }
 
     private Expr primary() {
+        if (match(FUN)) return  functionBody("function");
         if (match(FALSE)) return new Expr.Literal(false);
         if (match(TRUE)) return new Expr.Literal(true);
         if (match(NIL)) return new Expr.Literal(null);

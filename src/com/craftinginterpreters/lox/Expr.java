@@ -3,7 +3,7 @@ import java.util.List;
 
 abstract class Expr {
    interface Visitor<R> {
-    R visitLambdaExpr(Lambda expr);
+    R visitFunctionExpr(Function expr);
     R visitAssignExpr(Assign expr);
     R visitBinaryExpr(Binary expr);
     R visitCallExpr(Call expr);
@@ -13,15 +13,15 @@ abstract class Expr {
     R visitUnaryExpr(Unary expr);
     R visitVariableExpr(Variable expr);
    }
- static class Lambda extends Expr {
-   Lambda(List<Token> params, List<Stmt> body) {
+ static class Function extends Expr {
+   Function(List<Token> params, List<Stmt> body) {
       this.params = params;
       this.body = body;
     }
 
      @Override
      <R> R accept(Visitor<R> visitor) {
-        return visitor.visitLambdaExpr(this);
+        return visitor.visitFunctionExpr(this);
      }
 
      final List<Token> params;

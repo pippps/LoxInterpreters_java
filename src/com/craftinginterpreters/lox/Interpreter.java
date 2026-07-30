@@ -144,6 +144,17 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         return function.call(this, arguments);
     }
 
+    @Override
+    public Object visitAssignExpr(Expr.Assign expr) {
+        Object value = evaluate(expr.value);
+        environment.assign(expr.name, value);
+        return value;
+    }
+    @Override
+    public Object visitFunctionExpr(Expr.Function expr) {
+        return new LoxFunction(null, expr, environment);
+    }
+
     private void checkNumberOperand(Token operator, Object operand) {
         if (operand instanceof Double) return;
         throw new RuntimeError(operator, "Operand must be a number.");
@@ -218,7 +229,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     @Override
     public Void visitFunctionStmt(Stmt.Function stmt) {
-        LoxFunction function = new LoxFunction(stmt, environment);
+        LoxFunction function = new LoxFunction(stmt.name.lexeme, stmt.function, environment);
         environment.define(stmt.name.lexeme, function);
         return null;
     }
@@ -265,12 +276,5 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
             execute(stmt.body);
         }
         return null;
-    }
-
-    @Override
-    public Object visitAssignExpr(Expr.Assign expr) {
-        Object value = evaluate(expr.value);
-        environment.assign(expr.name, value);
-        return value;
     }
 }

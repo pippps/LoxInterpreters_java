@@ -47,10 +47,12 @@ public class Resolver implements Expr.Visitor<Void> , Stmt.Visitor<Void> {
 
     private void beginScope() {
         scopes.push(new HashMap<String, Boolean>());
+        indexs.push(new ArrayList<String>());
     }
 
     private void endScope() {
         scopes.pop();
+        indexs.pop();
     }
 
     private void declare(Token name) {

@@ -1,14 +1,13 @@
 package com.craftinginterpreters.lox;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 public class Resolver implements Expr.Visitor<Void> , Stmt.Visitor<Void> {
     private final Interpreter interpreter;
     private final Stack<Map<String, Variable>> scopes = new Stack<>();
+    private final int[] indexs = new int[100];
     private FunctionType currentFunction = FunctionType.NONE;
+    private int scopeDepth = 0;
 
     Resolver(Interpreter interpreter) {
         this.interpreter = interpreter;
@@ -21,11 +20,13 @@ public class Resolver implements Expr.Visitor<Void> , Stmt.Visitor<Void> {
 
     private class Variable {
         final Token name;
+        final int index;
         State state;
 
-        Variable(Token name, State state) {
+        Variable(Token name, State state, int index) {
             this.name = name;
             this.state = state;
+            this.index = index;
         }
 
         private enum State {
@@ -65,10 +66,13 @@ public class Resolver implements Expr.Visitor<Void> , Stmt.Visitor<Void> {
 
     private void beginScope() {
         scopes.push(new HashMap<String, Variable>());
+        scopeDepth++;
+
     }
 
     private void endScope() {
         Map<String, Variable> scope = scopes.pop();
+        scopeDepth--;
         for (Variable variable : scope.values()){
             if(variable.state != Variable.State.READ){
                 Lox.error(variable.name, "Local variable never used.");
@@ -84,7 +88,8 @@ public class Resolver implements Expr.Visitor<Void> , Stmt.Visitor<Void> {
         if (scope.containsKey(name.lexeme)) {
             Lox.error(name, "Already a variable with this name in this scope.");
         }
-        Variable var = new Variable(name, Variable.State.DECLARED);
+
+        Variable var = new Variable(name, Variable.State.DECLARED, indexs[scopeDepth]++);
 
         scope.put(name.lexeme, var);
     }
@@ -97,9 +102,10 @@ public class Resolver implements Expr.Visitor<Void> , Stmt.Visitor<Void> {
     private void resolveLocal(Expr expr, Token name, boolean isRead) {
         for (int i = scopes.size() - 1; i >= 0; i--) {
             if (scopes.get(i).containsKey(name.lexeme)) {
-                interpreter.resolve(expr, scopes.size() - 1 - i);
+                Variable var = scopes.get(i).get(name.lexeme);
+                interpreter.resolve(expr, scopes.size() - 1 - i, var.index);
                 if(isRead) {
-                    scopes.get(i).get(name.lexeme).state = Variable.State.READ;
+                    var.state = Variable.State.READ;
                 }
                 return;
             }

@@ -1,7 +1,11 @@
-class Bacon {
-    eat() {
-        print "Crunch crunch crunch";
+class Circle {
+    init(radius) {
+        this.radius = radius;
+    }
+
+    area {
+        return 3.14 * this.radius * this.radius;
     }
 }
-
-Bacon().eat();
+var circle = Circle(4);
+print circle.radius;

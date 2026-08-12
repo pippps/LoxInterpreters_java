@@ -3,9 +3,6 @@ class Circle {
         this.radius = radius;
     }
 
-    area {
-        return 3.14 * this.radius * this.radius;
-    }
 }
 var circle = Circle(4);
 print circle.radius;

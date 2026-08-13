@@ -1,14 +1,30 @@
-class Doughnut {
-    cook() {
-        print "Fry until golden brown.";
-    }
+trait A {
+  a() {
+    print "a";
+  }
 }
 
-class BostonCream < Doughnut {
-    cook() {
-        super.cook();
-        print "Pipe full of custard and coat with chocolate.";
-    }
+trait B1 {
+  b1() {
+    print "b1";
+  }
 }
 
-BostonCream().cook();
+trait B2 {
+  b2() {
+    print "b2";
+  }
+}
+
+trait B with B1, B2 {
+  b() {
+    this.b1();
+    this.b2();
+  }
+}
+
+class C with A, B {}
+
+var c = C();
+c.a();
+c.b();

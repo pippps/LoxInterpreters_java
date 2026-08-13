@@ -261,6 +261,29 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     }
 
+    Map<String, LoxFunction> applyTraits(List<Expr> traits) {
+        Map<String, LoxFunction> methods = new HashMap<>();
+
+        for(Expr traitExpr : traits) {
+            Object traitObject = evaluate(traitExpr);
+            if (!(traitObject instanceof LoxTrait)) {
+                Token name = ((Expr.Variable) traitObject).name;
+                throw new RuntimeError(name, name.lexeme + " is not a trait.");
+            }
+            LoxTrait trait = (LoxTrait) traitObject;
+            for (String name : ((LoxTrait) traitObject).methods.keySet()) {
+                if (methods.containsKey(name)) {
+                    throw new RuntimeError(trait.name, trait.name.lexeme + " is already a method name in " +
+                            "another trait.");
+                }
+                methods.put(name, trait.methods.get(name));
+            }
+        }
+
+        return methods;
+    }
+
+
     @Override
     public Void visitBlockStmt(Stmt.Block stmt) {
         executeBlock(stmt.statements, new Environment(environment));
@@ -283,7 +306,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
             environment.define("super", superclass);
         }
 
-        Map<String, LoxFunction> methods = new HashMap<>();
+        Map<String, LoxFunction> methods = applyTraits(stmt.traits);
         for (Stmt.Function method : stmt.methods) {
             LoxFunction function = new LoxFunction(method, environment, method.name.lexeme.equals("init"));
             methods.put(method.name.lexeme, function);
@@ -295,6 +318,29 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
             environment = environment.enclosing;
         }
         environment.assign(stmt.name, klass);
+        return null;
+    }
+
+    @Override
+    public Void visitTraitStmt(Stmt.Trait stmt) {
+        environment.define(stmt.name.lexeme, null);
+
+        Map<String, LoxFunction> methods = applyTraits(stmt.traits);
+
+        for (Stmt.Function method : stmt.methods) {
+            if (methods.containsKey(method.name.lexeme)) {
+                throw new RuntimeError(method.name,
+                        "A previous trait declares a method named '" + method.name.lexeme + "'.");
+            }
+
+            LoxFunction function = new LoxFunction( method, environment, false);
+            methods.put(method.name.lexeme, function);
+        }
+
+        LoxTrait trait = new LoxTrait(stmt.name, methods);
+
+        environment.assign(stmt.name, trait);
+
         return null;
     }
 

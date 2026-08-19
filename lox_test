@@ -1,14 +1,21 @@
 class Doughnut {
     cook() {
         print "Fry until golden brown.";
+        inner();
+    }
+    rotten() {
+        print "real badmen";
     }
 }
 
 class BostonCream < Doughnut {
     cook() {
-        super.cook();
         print "Pipe full of custard and coat with chocolate.";
-    }
+   }
+   rotten() {
+        print "berk";
+   }
 }
 
-BostonCream().cook();
+var cacao = BostonCream().rotten();
+var cook = BostonCream().cook();

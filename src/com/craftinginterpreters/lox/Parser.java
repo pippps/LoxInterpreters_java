@@ -140,14 +140,30 @@ public class Parser {
 
     private Stmt varDeclaration() {
         Token name = consume(IDENTIFIER, "Expect variable name.");
-
         Expr initializer = null;
-        if (match(EQUAL)) {
-            initializer = expression();
-        }
 
-        consume(SEMICOLON, "Expect ';' after variable declaration.");
-        return new Stmt.Var(name, initializer);
+        if(match(LEFT_BRACKET)) {
+            Expr size = expression();
+            consume(RIGHT_BRACKET, "Expect ']' after array size.");
+            List<Expr> values = new ArrayList<>();
+            if (match(EQUAL)) {
+                consume(LEFT_BRACE, "Expect '{' array declaration.");
+                do {
+                    values.add(expression());
+                } while(match(COMMA));
+                consume(RIGHT_BRACE, "Expect '}' at the end of the array.");
+            }
+
+            consume(SEMICOLON, "Expect ';' after variable declaration.");
+            return new Stmt.Array(name, size, values);
+        } else {
+            if (match(EQUAL)) {
+                initializer = expression();
+            }
+
+            consume(SEMICOLON, "Expect ';' after variable declaration.");
+            return new Stmt.Var(name, initializer);
+        }
     }
 
     private Stmt whileStatement() {

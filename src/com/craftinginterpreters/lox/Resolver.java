@@ -163,6 +163,18 @@ public class Resolver implements Expr.Visitor<Void> , Stmt.Visitor<Void> {
     }
 
     @Override
+    public Void visitArrayStmt(Stmt.Array stmt) {
+        declare(stmt.name);
+        if (stmt.values != null){
+            for(Expr value : stmt.values) {
+                resolve(value);
+            }
+        }
+        define(stmt.name);
+        return null;
+    }
+
+    @Override
     public Void visitPrintStmt(Stmt.Print stmt) {
         resolve(stmt.expression);
         return null;

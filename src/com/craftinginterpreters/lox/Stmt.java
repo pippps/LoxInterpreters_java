@@ -8,6 +8,7 @@ abstract class Stmt {
     R visitExpressionStmt(Expression stmt);
     R visitFunctionStmt(Function stmt);
     R visitIfStmt(If stmt);
+    R visitArrayStmt(Array stmt);
     R visitPrintStmt(Print stmt);
     R visitReturnStmt(Return stmt);
     R visitWhileStmt(While stmt);
@@ -84,6 +85,22 @@ abstract class Stmt {
      final Expr condition;
      final Stmt thenBranch;
      final Stmt elseBranch;
+  }
+ static class Array extends Stmt {
+   Array(Token name, Expr size, List<Expr> values) {
+      this.name = name;
+      this.size = size;
+      this.values = values;
+    }
+
+     @Override
+     <R> R accept(Visitor<R> visitor) {
+        return visitor.visitArrayStmt(this);
+     }
+
+     final Token name;
+     final Expr size;
+     final List<Expr> values;
   }
  static class Print extends Stmt {
    Print(Expr expression) {

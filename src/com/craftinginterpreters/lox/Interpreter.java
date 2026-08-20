@@ -322,6 +322,18 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     }
 
     @Override
+    public Void visitArrayStmt(Stmt.Array stmt) {
+        List<Object> values = new ArrayList<>();
+        if (stmt.values != null) {
+            for ( Expr value : stmt.values) {
+                values.add(evaluate(value));
+            }
+        }
+        environment.define(stmt.name.lexeme, values);
+        return null;
+    }
+
+    @Override
     public Void visitPrintStmt(Stmt.Print stmt) {
         Object value = evaluate(stmt.expression);
         System.out.println(stringify(value));
